@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>canvas时钟</title>
+</head>
+<body>
+	<canvas id="canvas" width="500" height="500"></canvas>
+	<script>
+
+
+		function CanvasClock(props) {
+			if(!props.canvas || props.canvas instanceof HTMLCanvasElement == false){
+				throw new Error('Can not find canvas!');
+			}
+			//console.log(this.canvas)
+			this.canvas = props.canvas;
+			this.cxt = this.canvas.getContext('2d');
+			this.W = this.canvas.width;
+			this.H = this.canvas.height;
+			this.R = this.H/2;
+			return this;
+		}
+		CanvasClock.prototype.init = function() {
+			var _this = this;
+			setInterval(function(){
+				var time = new Date();
+				var s = time.getSeconds();
+				var m = time.getMinutes() + s/60;
+				var h = time.getHours() + m/60;
+				_this.cxt.clearRect(0,0,_this.W,_this.H);
+				_this.update(h,m,s);
+			}, 200);
+		};
+		CanvasClock.prototype.update = function(h,m,s) {
+			this.drawOutter();
+			this.drawNum()
+			this.drawTicks()
+			this.drawHours(h)
+			this.drawMins(m)
+			this.drawSecs(s)
+			this.drawCircle();
+		};
+		CanvasClock.prototype.drawOutter = function() {
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.lineWidth = 8;
+			this.cxt.beginPath();
+			this.cxt.arc(0,0,this.R - 4,0,Math.PI*2);
+			this.cxt.stroke();
+			this.cxt.restore();
+			return this;
+		};
+		CanvasClock.prototype.drawNum = function() {
+			var arr = [3,4,5,6,7,8,9,10,11,12,1,2];
+			var _this = this;
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.font = '28px Arial';
+			this.cxt.textAlign = 'center';
+			this.cxt.textBaseline = 'middle';
+			this.cxt.beginPath();
+			arr.forEach((item,i)=>{
+				var rad = Math.PI / 6 * i;
+				var x = Math.cos(rad) * (_this.R - 38);
+				var y = Math.sin(rad) * (_this.R - 38);
+				_this.cxt.fillText(item,x,y)
+			});
+			this.cxt.restore();
+			return this;
+		};
+		CanvasClock.prototype.drawTicks = function() {
+			var r;
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			for(var i=0; i<60; i++){
+				var rad = Math.PI*2 / 60 * i;
+				var x = Math.cos(rad) * (this.R - 18);
+				var y = Math.sin(rad) * (this.R - 18);
+				this.cxt.beginPath();
+				if(i%5 == 0){
+					this.cxt.fillStyle = '#000';
+					r = 3;
+				}else{
+					r = 2.5;
+					this.cxt.fillStyle = '#666666';
+				}
+				this.cxt.arc(x, y, r, 0, Math.PI*2);
+				this.cxt.fill();
+			}
+			this.cxt.restore();
+			return this;
+		};
+
+		CanvasClock.prototype.drawHours = function(h) {
+			var rad = Math.PI / 6 * h;
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.rotate(rad);
+			this.cxt.lineWidth = 8;
+			this.cxt.lineCap = 'round';
+			this.cxt.beginPath();
+			this.cxt.lineTo(0,10);
+			this.cxt.lineTo(0,-(this.R - 100));
+			this.cxt.stroke();
+			this.cxt.restore();
+			return this;
+		};
+		CanvasClock.prototype.drawMins = function(m) {
+			var rad = Math.PI * 2 / 60 * m;
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.rotate(rad);
+			this.cxt.lineWidth = 5;
+			this.cxt.lineCap = 'round';
+			this.cxt.beginPath();
+			this.cxt.lineTo(0,10);
+			this.cxt.lineTo(0,-(this.R - 70));
+			this.cxt.stroke();
+			this.cxt.restore();
+			return this;
+		};
+		CanvasClock.prototype.drawSecs = function(s) {
+			var rad = Math.PI * 2 / 60 * s;
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.rotate(rad);
+			this.cxt.beginPath();
+			this.cxt.lineTo(-3,10);
+			this.cxt.lineTo(3,10);
+			this.cxt.lineTo(1,-(this.R - 20));
+			this.cxt.lineTo(-1,-(this.R - 20));
+			this.cxt.closePath();
+			this.cxt.fillStyle = '#FF0000';
+			this.cxt.fill();
+			this.cxt.restore();
+			return this;
+		};
+		CanvasClock.prototype.drawCircle = function() {
+			this.cxt.save();
+			this.cxt.translate(this.W/2,this.H/2);
+			this.cxt.beginPath();
+			this.cxt.arc(0,0,8,0,2*Math.PI);
+			this.cxt.fillStyle = '#F7FF20';
+			this.cxt.fill();
+			this.cxt.restore();
+			return this;
+		};
+
+		var cc = new CanvasClock({
+			canvas:document.getElementById('canvas')
+		})
+		//console.log(cc.drawOutter);
+		//cc.drawOutter().drawNum().drawTicks().drawHours(1).drawMins(20).drawSecs(45).drawCircle();
+		cc.init();
+
+
+
+
+
+
+
+
+
+
+	</script>
+</body>
+</html>
